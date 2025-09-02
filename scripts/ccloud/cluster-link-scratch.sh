@@ -106,7 +106,7 @@ curl -X POST -H "Content-Type: application/json" \
     }
   }' \
   --cacert scripts/security/snakeoil-ca-1.crt \
-  -u superUser:superUser \
+  -u superUser:${SUPER_USER_PASSWORD} \
   https://localhost:8085/exporters
 
 # teardown

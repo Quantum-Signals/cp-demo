@@ -46,6 +46,10 @@ fi
 #-------------------------------------------------------------------------------
 
 # Bring up openldap
+
+#FIXME: Hack in superUser password.
+sed -i "s|\(userPassword *: *\).*|\1${SUPER_USER_PASSWORD}|" ${DIR}/security/ldap_users/13_superuser.ldif
+
 docker compose up --no-recreate -d openldap
 sleep 5
 if [[ $(docker compose ps openldap | grep Exit) =~ "Exit" ]] ; then
@@ -156,7 +160,7 @@ cat << EOF
 ----------------------------------------------------------------------------------------------------
 DONE! From your browser:
 
-  Confluent Control Center (login superUser/superUser for full access):
+  Confluent Control Center (login superUser/\$SUPER_USER_PASSWORD for full access):
      $C3URL
 
 EOF

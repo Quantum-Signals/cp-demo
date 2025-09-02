@@ -9,7 +9,7 @@
 rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 *.log
 
 # Generate CA key
-openssl req -new -x509 -keyout snakeoil-ca-1.key -out snakeoil-ca-1.crt -days 365 -subj '/CN=localhost/OU=TEST/O=CONFLUENT/L=PaloAlto/ST=Ca/C=US' -passin pass:confluent -passout pass:confluent
+openssl req -new -x509 -keyout snakeoil-ca-1.key -out snakeoil-ca-1.crt -days 365 -subj "/CN=${SSL_CA_CN}/OU=TEST/O=CONFLUENT/L=PaloAlto/ST=Ca/C=US" -passin pass:confluent -passout pass:confluent
 
 # ksqlDB Server (ksqldb-server) and Control Center (control-center) share a commom certificate; a separate certificate is not generated for ksqldb-server
 # this shared certificate has a self-signed CA - when control-center presents the certificate to a browser visiting control-center at https://localhost:9092 ,

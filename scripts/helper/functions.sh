@@ -73,7 +73,7 @@ poststart_checks()
   fi
 
   # Validate connectors are running
-  connectorList=$(docker exec connect curl -s -X GET --cert /etc/kafka/secrets/connect.certificate.pem --key /etc/kafka/secrets/connect.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:superUser https://connect:8083/connectors/ | jq -r @sh | xargs echo)
+  connectorList=$(docker exec connect curl -s -X GET --cert /etc/kafka/secrets/connect.certificate.pem --key /etc/kafka/secrets/connect.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:${SUPER_USER_PASSWORD} https://connect:8083/connectors/ | jq -r @sh | xargs echo)
   for connector in $connectorList; do
     check_connector_status_running $connector || echo -e "\nWARNING: Connector $connector is not in RUNNING state. Is it still starting up?"
   done
@@ -81,7 +81,7 @@ poststart_checks()
   # Check number of Schema Registry subjects
   # The subject created by the Kafka Streams app may be created after start script ends, so ignore that subject here (to not add time to start script)
   numSubjects=6
-  foundSubjects=$(docker exec schemaregistry curl -s -X GET --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:superUser https://schemaregistry:8085/subjects | jq length)
+  foundSubjects=$(docker exec schemaregistry curl -s -X GET --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:${SUPER_USER_PASSWORD} https://schemaregistry:8085/subjects | jq length)
   if [[ $foundSubjects -lt $numSubjects ]]; then
     echo -e "\nWARNING: Expected to find at least $numSubjects subjects in Schema Registry but found $foundSubjects subjects. Please troubleshoot, see https://docs.confluent.io/platform/current/tutorials/cp-demo/docs/troubleshooting.html"
   fi
@@ -129,7 +129,7 @@ create_certificates()
   # Generate keys and certificates used for SSL
   echo -e "Generate keys and certificates used for SSL (see ${DIR}/security)"
   # Install findutils to be able to use 'xargs' in the certs-create.sh script
-  docker run -v ${DIR}/../security/:/etc/kafka/secrets/ -u0 $REPOSITORY/cp-server:${CONFLUENT_DOCKER_TAG} bash -c "yum -y install findutils; cd /etc/kafka/secrets && ./certs-create.sh && chown -R $(id -u $USER):$(id -g $USER) /etc/kafka/secrets"
+  docker run -e SSL_CA_CN=${SSL_CA_CN} -v ${DIR}/../security/:/etc/kafka/secrets/ -u0 $REPOSITORY/cp-server:${CONFLUENT_DOCKER_TAG} bash -c "yum -y install findutils; cd /etc/kafka/secrets && ./certs-create.sh && chown -R $(id -u $USER):$(id -g $USER) /etc/kafka/secrets"
   
   # Generating public and private keys for token signing
   echo "Generating public and private keys for token signing"
@@ -232,7 +232,7 @@ host_check_up()
 
 host_check_schema_registered()
 {
-  FOUND=$(docker exec schemaregistry curl -s -X GET --cert /etc/kafka/secrets/schemaregistry.certificate.pem --key /etc/kafka/secrets/schemaregistry.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:superUser https://schemaregistry:8085/subjects | grep "wikipedia.parsed-value")
+  FOUND=$(docker exec schemaregistry curl -s -X GET --cert /etc/kafka/secrets/schemaregistry.certificate.pem --key /etc/kafka/secrets/schemaregistry.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:${SUPER_USER_PASSWORD} https://schemaregistry:8085/subjects | grep "wikipedia.parsed-value")
   if [ -z "$FOUND" ]; then
     return 1
   fi
@@ -274,7 +274,7 @@ END
 check_connector_status_running() {
   connectorName=$1
 
-  STATE=$(docker exec connect curl -X GET --cert /etc/kafka/secrets/connect.certificate.pem --key /etc/kafka/secrets/connect.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:superUser https://connect:8083/connectors/$connectorName/status 2>/dev/null | jq -r .connector.state)
+  STATE=$(docker exec connect curl -X GET --cert /etc/kafka/secrets/connect.certificate.pem --key /etc/kafka/secrets/connect.key --tlsv1.2 --cacert /etc/kafka/secrets/snakeoil-ca-1.crt -u superUser:${SUPER_USER_PASSWORD} https://connect:8083/connectors/$connectorName/status 2>/dev/null | jq -r .connector.state)
   if [[ "$STATE" != "RUNNING" ]]; then
     return 1
   fi

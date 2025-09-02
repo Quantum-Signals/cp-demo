@@ -17,7 +17,6 @@ KSQLDB=ksql-cluster
 C3=c3-cluster
 
 SUPER_USER=superUser
-SUPER_USER_PASSWORD=superUser
 SUPER_USER_PRINCIPAL="User:$SUPER_USER"
 CONNECT_ADMIN="User:connectAdmin"
 CONNECTOR_SUBMITTER="User:connectorSubmitter"

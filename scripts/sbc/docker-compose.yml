@@ -104,7 +104,7 @@ services:
       # Schema Validation
       KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: https://schemaregistry:8085
       KAFKA_CONFLUENT_BASIC_AUTH_CREDENTIALS_SOURCE: USER_INFO
-      KAFKA_CONFLUENT_BASIC_AUTH_USER_INFO: 'superUser:superUser'
+      KAFKA_CONFLUENT_BASIC_AUTH_USER_INFO: superUser:${SUPER_USER_PASSWORD}
       KAFKA_CONFLUENT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka3.truststore.jks
       KAFKA_CONFLUENT_SSL_TRUSTSTORE_PASSWORD: confluent
 
