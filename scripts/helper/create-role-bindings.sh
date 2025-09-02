@@ -118,36 +118,6 @@ do
 done
 
 ################################### Connectors ###################################
-echo "Creating role bindings for wikipedia-sse connector"
-
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_SUBMITTER \
-    --role ResourceOwner \
-    --resource Connector:wikipedia-sse \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --connect-cluster-id $CONNECT
-
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Subject:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
-# enable.idempotence=true requires IdempotentWrite
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_PRINCIPAL \
-    --role DeveloperWrite \
-    --resource Cluster:kafka-cluster \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 echo "Creating role bindings for replicate-topic connector"
 
@@ -180,21 +150,6 @@ confluent iam rbac role-binding create \
     --role ResourceOwner \
     --resource Group:connect-elasticsearch-ksqldb \
     --kafka-cluster-id $KAFKA_CLUSTER_ID \
-
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CONNECTOR_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Subject:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
 
 ################################### ksqlDB Admin ###################################
 echo "Creating role bindings for ksqlDB Admin"
@@ -243,45 +198,8 @@ confluent iam rbac role-binding create \
 confluent iam rbac role-binding create \
     --principal $KSQLDB_ADMIN \
     --role ResourceOwner \
-    --resource Topic:wikipedia.parsed \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_ADMIN \
-    --role ResourceOwner \
-    --resource Topic:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_ADMIN \
-    --role ResourceOwner \
     --resource TransactionalId:${KSQLDB} \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_ADMIN \
-    --role ResourceOwner \
-    --resource Subject:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_ADMIN \
-    --role ResourceOwner \
-    --resource Subject:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_ADMIN \
-    --role ResourceOwner \
-    --resource Subject:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
 
 # enable.idempotence=true requires IdempotentWrite
 confluent iam rbac role-binding create \
@@ -328,35 +246,6 @@ confluent iam rbac role-binding create \
     --resource Topic:${KSQLDB}ksql_processing_log \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_USER \
-    --role ResourceOwner \
-    --resource Topic:wikipedia.parsed \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_USER \
-    --role ResourceOwner \
-    --resource Subject:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_USER \
-    --role ResourceOwner \
-    --resource Topic:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $KSQLDB_USER \
-    --role ResourceOwner \
-    --resource Subject:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
 # enable.idempotence=true requires IdempotentWrite
 confluent iam rbac role-binding create \
     --principal $KSQLDB_USER \
@@ -393,13 +282,13 @@ do
 done
 
 ################################### Client ###################################
-echo "Creating role bindings for the streams-demo application"
+echo "Creating role bindings for Python client"
 
+# Allow access to all topics (dev playground).
 confluent iam rbac role-binding create \
     --principal $CLIENT_PRINCIPAL \
     --role ResourceOwner \
-    --resource Group:wikipedia \
-    --prefix \
+    --resource "Topic:*" \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 confluent iam rbac role-binding create \
@@ -408,33 +297,6 @@ confluent iam rbac role-binding create \
     --resource Group:app \
     --prefix \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CLIENT_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CLIENT_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:users \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CLIENT_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:_confluent-monitoring \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $CLIENT_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Subject:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
 
 ################################### Listen Client ###################################
 echo "Creating role bindings for the listen client application"
@@ -445,36 +307,6 @@ confluent iam rbac role-binding create \
     --resource Group:listen-consumer \
     --prefix \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $LISTEN_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $LISTEN_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Topic:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID
-
-confluent iam rbac role-binding create \
-    --principal $LISTEN_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Subject:wikipedia \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
-
-confluent iam rbac role-binding create \
-    --principal $LISTEN_PRINCIPAL \
-    --role ResourceOwner \
-    --resource Subject:WIKIPEDIA \
-    --prefix \
-    --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --schema-registry-cluster-id $SR
 
 ######################### Print #########################
 

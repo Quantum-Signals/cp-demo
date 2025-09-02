@@ -5,8 +5,8 @@ JWT_TOKEN=$(curl -s -u controlcenterAdmin:controlcenterAdmin http://localhost:90
 
 clusterId=$(curl -s -X GET -H "Authorization: Bearer ${JWT_TOKEN}" http://localhost:9021/2.0/clusters/kafka/ | jq --raw-output '.[0].clusterId')
 
-echo -e "\nRename the cluster in Control Center from ${clusterId} to Kafka Raleigh"
-curl -X PATCH -H "Authorization: Bearer ${JWT_TOKEN}" -H "Content-Type: application/merge-patch+json" -d '{"displayName":"Kafka Raleigh"}' http://localhost:9021/2.0/clusters/kafka/$clusterId
+echo -e "\nRename the cluster in Control Center"
+curl -X PATCH -H "Authorization: Bearer ${JWT_TOKEN}" -H "Content-Type: application/merge-patch+json" -d '{"displayName":"Quantum Signals DEV"}' http://localhost:9021/2.0/clusters/kafka/$clusterId
 
 echo -e "\nConfigure triggers and actions in Control Center:"
 

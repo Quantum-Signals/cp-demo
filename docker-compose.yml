@@ -98,17 +98,17 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               publicKeyPath="/tmp/conf/public.pem";
 
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 2
-      KAFKA_CONFLUENT_SECURITY_EVENT_LOGGER_EXPORTER_KAFKA_TOPIC_REPLICAS: 2
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_SECURITY_EVENT_LOGGER_EXPORTER_KAFKA_TOPIC_REPLICAS: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CONFLUENT_BALANCER_HEAL_BROKER_FAILURE_THRESHOLD_MS: 30000
 
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
-      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
 
       # Confluent Health+
       # We recommend using Confluent Health+ to set up fully managed monitoring and alerting for your CP deployment.
@@ -122,8 +122,8 @@ services:
 
       # Confluent Metrics Reporter
       KAFKA_METRIC_REPORTERS: io.confluent.telemetry.reporter.TelemetryReporter
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 2
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka1:9091,kafka2:9092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka1:9091
       CONFLUENT_METRICS_REPORTER_SECURITY_PROTOCOL: SASL_PLAINTEXT
       CONFLUENT_METRICS_REPORTER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required \
         username=\"admin\" \
@@ -167,7 +167,7 @@ services:
       KAFKA_CONFLUENT_SSL_TRUSTSTORE_PASSWORD: confluent
 
       # MDS
-      KAFKA_CONFLUENT_METADATA_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_CONFLUENT_METADATA_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CONFLUENT_METADATA_SERVER_AUTHENTICATION_METHOD: BEARER
       KAFKA_CONFLUENT_METADATA_SERVER_LISTENERS: https://0.0.0.0:8091
       KAFKA_CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: https://kafka1:8091
@@ -207,7 +207,7 @@ services:
       KAFKA_LDAP_USER_OBJECT_CLASS: inetOrgPerson
 
       # EmbeddedKafkaRest: Kafka Client Configuration
-      KAFKA_KAFKA_REST_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091,SASL_SSL://kafka2:10092
+      KAFKA_KAFKA_REST_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091
       KAFKA_KAFKA_REST_CLIENT_SECURITY_PROTOCOL: SASL_SSL
       KAFKA_KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.truststore.jks
       KAFKA_KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD: confluent
@@ -219,7 +219,7 @@ services:
       KAFKA_KAFKA_REST_REST_SERVLET_INITIALIZOR_CLASSES: io.confluent.common.security.jetty.initializer.InstallBearerOrBasicSecurityHandler
       KAFKA_KAFKA_REST_PUBLIC_KEY_PATH: /tmp/conf/public.pem
       # EmbeddedKafkaRest: MDS Client configuration
-      KAFKA_KAFKA_REST_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      KAFKA_KAFKA_REST_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       KAFKA_KAFKA_REST_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.truststore.jks
       KAFKA_KAFKA_REST_SSL_TRUSTSTORE_PASSWORD: confluent
       KAFKA_KAFKA_REST_CONFLUENT_METADATA_HTTP_AUTH_CREDENTIALS_PROVIDER: BASIC
@@ -232,6 +232,8 @@ services:
       KAFKA_PASSWORD_ENCODER_SECRET: encoder-secret
 
   kafka2:
+    profiles:
+      - donotstart
     image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
     hostname: kafka2
     container_name: kafka2
@@ -439,7 +441,7 @@ services:
     environment:
       CUB_CLASSPATH: '/usr/share/java/confluent-security/connect/*:/usr/share/java/kafka/*:/usr/share/java/cp-base-new/*'
 
-      CONNECT_BOOTSTRAP_SERVERS: kafka1:10091,kafka2:10092
+      CONNECT_BOOTSTRAP_SERVERS: kafka1:10091
       CONNECT_LISTENERS: https://0.0.0.0:8083
       CONNECT_GROUP_ID: "connect-cluster"
       CONNECT_PRODUCER_CLIENT_ID: "connect-worker-producer"
@@ -449,10 +451,10 @@ services:
       CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
       CONNECT_STATUS_STORAGE_TOPIC: connect-statuses
 
-      CONNECT_REPLICATION_FACTOR: 2
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 2
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 2
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 2
+      CONNECT_REPLICATION_FACTOR: 1
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
 
       CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
       CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
@@ -506,7 +508,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="connectAdmin" \
               password="connectAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
 
       # Allow overriding configs on the connector level
       CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: 'All'
@@ -520,7 +522,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="connectAdmin" \
               password="connectAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
 
       # Consumer
       CONNECT_CONSUMER_SASL_MECHANISM: 'OAUTHBEARER'
@@ -531,7 +533,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="connectAdmin" \
               password="connectAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
 
       # Default admin config
       CONNECT_ADMIN_SECURITY_PROTOCOL: SASL_SSL
@@ -550,7 +552,7 @@ services:
       CONNECT_PUBLIC_KEY_PATH: /tmp/conf/public.pem
 
       # Used by Connect's REST layer to connect to MDS to verify tokens and authenticate clients
-      CONNECT_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      CONNECT_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       CONNECT_CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: 'connectAdmin:connectAdmin'
       CONNECT_CONFLUENT_METADATA_HTTP_AUTH_CREDENTIALS_PROVIDER: 'BASIC'
 
@@ -558,8 +560,8 @@ services:
       CONNECT_CONFIG_PROVIDERS: 'secret'
       CONNECT_CONFIG_PROVIDERS_SECRET_CLASS: 'io.confluent.connect.secretregistry.rbac.config.provider.InternalSecretConfigProvider'
       CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_MASTER_ENCRYPTION_KEY: 'password1234'
-      CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:10091,kafka2:10092
-      CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 2
+      CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:10091
+      CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
       CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
       CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.connect.truststore.jks
       CONNECT_CONFIG_PROVIDERS_SECRET_PARAM_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: confluent
@@ -572,7 +574,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="connectAdmin" \
               password="connectAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
 
       CONNECT_SSL_CIPHER_SUITES: ${SSL_CIPHER_SUITES}
 
@@ -584,6 +586,8 @@ services:
 
 
   elasticsearch:
+    profiles:
+      - donotstart
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     container_name: elasticsearch
     #restart: always
@@ -601,6 +605,8 @@ services:
       cluster.name: "elasticsearch-cp-demo"
 
   kibana:
+    profiles:
+      - donotstart
     image: docker.elastic.co/kibana/kibana-oss:7.10.0
     container_name: kibana
     restart: always
@@ -661,8 +667,6 @@ services:
         condition: service_healthy
       kafka1:
         condition: service_healthy
-      kafka2:
-        condition: service_healthy
       connect:
         condition: service_healthy
       ksqldb-server:
@@ -686,8 +690,8 @@ services:
       # You can now remove all Control Center "STREAMS", "MONITORING", and "METRICS" configurations
       
       # general settings
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091,SASL_SSL://kafka2:10092
-      CONTROL_CENTER_REPLICATION_FACTOR: 2
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
 
       # Control Center uses Kafka Streams to process metrics
@@ -698,12 +702,12 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="controlcenterAdmin" \
               password="controlcenterAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
       CONTROL_CENTER_STREAMS_SSL_CIPHER_SUITES: ${SSL_CIPHER_SUITES}
 
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 2
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
-      CONTROL_CENTER_METRICS_TOPIC_REPLICATION: 2
+      CONTROL_CENTER_METRICS_TOPIC_REPLICATION: 1
       CONTROL_CENTER_METRICS_TOPIC_PARTITIONS: 1
 
       # Amount of heap to use for internal caches. Increase for better throughput
@@ -748,16 +752,16 @@ services:
       PUBLIC_KEY_PATH: /tmp/conf/public.pem
       
       # Used by Control Center to connect to MDS to verify tokens and authenticate clients
-      CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: controlcenterAdmin:controlcenterAdmin
 
       # Used by Control Center to connect to the Admin API for Self Balancing Clusters
-      CONTROL_CENTER_STREAMS_CPREST_URL: "https://kafka1:8091,https://kafka2:8092"
+      CONTROL_CENTER_STREAMS_CPREST_URL: "https://kafka1:8091"
 
       # Enable email alerts
       CONTROL_CENTER_MAIL_ENABLED: true
 
-      CONFLUENT_METRICS_TOPIC_REPLICATION: 2
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
 
       # prometheus and alertmanager
       CONTROL_CENTER_PROMETHEUS_ENABLE: true
@@ -778,8 +782,6 @@ services:
     depends_on:
       kafka1:
         condition: service_healthy
-      kafka2:
-        condition: service_healthy
     volumes:
       - ./scripts/security:/etc/kafka/secrets
       - ./scripts/security/keypair:/tmp/conf
@@ -790,7 +792,7 @@ services:
 
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
 
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:10091,kafka2:10092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:10091
       SCHEMA_REGISTRY_LISTENERS: https://0.0.0.0:8085
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
 
@@ -800,7 +802,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="schemaregistryUser" \
               password="schemaregistryUser" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.schemaregistry.truststore.jks
       SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: confluent
       SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.schemaregistry.keystore.jks
@@ -817,7 +819,7 @@ services:
       SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "https"
       SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
       SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 2
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
       SCHEMA_REGISTRY_SSL_CIPHER_SUITES: ${SSL_CIPHER_SUITES}
 
       SCHEMA_REGISTRY_DEBUG: 'true'
@@ -830,7 +832,7 @@ services:
       SCHEMA_REGISTRY_PUBLIC_KEY_PATH: /tmp/conf/public.pem
 
       # Used by Schema Registry to connect to MDS to authenticate and authorize clients
-      SCHEMA_REGISTRY_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      SCHEMA_REGISTRY_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       SCHEMA_REGISTRY_CONFLUENT_METADATA_HTTP_AUTH_CREDENTIALS_PROVIDER: BASIC
       SCHEMA_REGISTRY_CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: schemaregistryUser:schemaregistryUser
 
@@ -866,20 +868,20 @@ services:
       KSQL_LOG4J_ROOT_LOGLEVEL: INFO
 
       KSQL_KSQL_SERVICE_ID: "ksql-cluster"
-      KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 2
-      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 2
+      KSQL_KSQL_STREAMS_REPLICATION_FACTOR: 1
+      KSQL_KSQL_INTERNAL_TOPIC_REPLICAS: 1
 
       # For Demo purposes: improve resource utilization and avoid timeouts
       KSQL_KSQL_STREAMS_NUM_STREAM_THREADS: 1
 
       KSQL_LOG4J_OPTS: "-Dlog4j.configuration=file:/tmp/helper/log4j-secure.properties"
-      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 2
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
 
       KSQL_PRODUCER_ENABLE_IDEMPOTENCE: 'true'
 
-      KSQL_BOOTSTRAP_SERVERS: kafka1:10091,kafka2:10092
+      KSQL_BOOTSTRAP_SERVERS: kafka1:10091
       KSQL_HOST_NAME: ksqldb-server
       KSQL_LISTENERS: "http://0.0.0.0:8088,https://0.0.0.0:8089"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
@@ -891,7 +893,7 @@ services:
       KSQL_PUBLIC_KEY_PATH: /tmp/conf/public.pem
 
       # Used by ksqlDB's REST layer to connect to MDS to verify tokens and authenticate clients
-      KSQL_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      KSQL_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       KSQL_CONFLUENT_METADATA_HTTP_AUTH_CREDENTIALS_PROVIDER: BASIC
       KSQL_CONFLUENT_METADATA_BASIC_AUTH_CREDENTIALS_PROVIDER: USER_INFO
       KSQL_CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: ksqlDBAdmin:ksqlDBAdmin
@@ -919,7 +921,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="ksqlDBAdmin" \
               password="ksqlDBAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
 
       KSQL_KSQL_SCHEMA_REGISTRY_BASIC_AUTH_CREDENTIALS_SOURCE: USER_INFO
       KSQL_KSQL_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO: ksqlDBAdmin:ksqlDBAdmin
@@ -951,7 +953,7 @@ services:
       - 8086:8086
     environment:
       KAFKA_REST_HOST_NAME: restproxy
-      KAFKA_REST_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091,SASL_SSL://kafka2:10092
+      KAFKA_REST_BOOTSTRAP_SERVERS: SASL_SSL://kafka1:10091
       KAFKA_REST_LISTENERS: https://0.0.0.0:8086
 
       KAFKA_REST_SCHEMA_REGISTRY_URL: https://schemaregistry:8085
@@ -982,7 +984,7 @@ services:
               org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
               username="restAdmin" \
               password="restAdmin" \
-              metadataServerUrls="https://kafka1:8091,https://kafka2:8092";
+              metadataServerUrls="https://kafka1:8091";
       KAFKA_REST_SSL_CIPHER_SUITES: ${SSL_CIPHER_SUITES}
 
       # Enable bearer token authentication which allows the identity of the REST Proxy end user to be propagated to Kafka for authorization
@@ -993,12 +995,14 @@ services:
       # Used by REST Proxy to connect to MDS to verify tokens and authenticate clients
       KAFKA_REST_CONFLUENT_METADATA_SERVER_URLS_MAX_AGE_MS: 60000
       KAFKA_REST_CLIENT_CONFLUENT_METADATA_SERVER_URLS_MAX_AGE_MS: 60000
-      KAFKA_REST_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091,https://kafka2:8092
+      KAFKA_REST_CONFLUENT_METADATA_BOOTSTRAP_SERVER_URLS: https://kafka1:8091
       KAFKA_REST_CONFLUENT_METADATA_HTTP_AUTH_CREDENTIALS_PROVIDER: BASIC
       KAFKA_REST_CONFLUENT_METADATA_BASIC_AUTH_USER_INFO: 'restAdmin:restAdmin'
 
 
   streams-demo:
+    profiles:
+      - donotstart
     image: cnfldemos/cp-demo-kstreams:0.0.12
     restart: always
     depends_on:
@@ -1011,5 +1015,5 @@ services:
     env_file:
       - ./env_files/streams-demo.env
     environment:
-      KAFKA_REPLICATION_FACTOR: 2
+      KAFKA_REPLICATION_FACTOR: 1
   

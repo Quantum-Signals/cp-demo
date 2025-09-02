@@ -1,7 +1,7 @@
 {
     "topic_name": $topic_name,
     "partitions_count": 2,
-    "replication_factor": 2,
+    "replication_factor": 1,
     "configs": [
         {
             "name": "confluent.value.schema.validation",

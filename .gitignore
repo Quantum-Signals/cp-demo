@@ -24,3 +24,6 @@ ui/expanded
 kstreams-app/bin
 scripts/ccloud/cluster-link-cp.properties
 scripts/ccloud/schema-link.properties
+
+# Environments
+.envrc
