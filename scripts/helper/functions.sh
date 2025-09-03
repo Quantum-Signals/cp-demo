@@ -129,7 +129,7 @@ create_certificates()
   # Generate keys and certificates used for SSL
   echo -e "Generate keys and certificates used for SSL (see ${DIR}/security)"
   # Install findutils to be able to use 'xargs' in the certs-create.sh script
-  docker run -e SSL_CA_CN=${SSL_CA_CN} -v ${DIR}/../security/:/etc/kafka/secrets/ -u0 $REPOSITORY/cp-server:${CONFLUENT_DOCKER_TAG} bash -c "yum -y install findutils; cd /etc/kafka/secrets && ./certs-create.sh && chown -R $(id -u $USER):$(id -g $USER) /etc/kafka/secrets"
+  docker run -e EXTERNAL_HOSTNAME=${EXTERNAL_HOSTNAME} -v ${DIR}/../security/:/etc/kafka/secrets/ -u0 $REPOSITORY/cp-server:${CONFLUENT_DOCKER_TAG} bash -c "yum -y install findutils; cd /etc/kafka/secrets && ./certs-create.sh && chown -R $(id -u $USER):$(id -g $USER) /etc/kafka/secrets"
   
   # Generating public and private keys for token signing
   echo "Generating public and private keys for token signing"
@@ -140,7 +140,7 @@ create_certificates()
   chmod 644 ${DIR}/../security/keypair/keypair.pem
   chmod 644 ${DIR}/../security/*.key
 
-  echo -e "INFO: Adding default java certificates to kafka.connect.truststore.jks to reach to Wikipedia over HTTPS"
+  echo -e "INFO: Adding default java certificates to kafka.connect.truststore.jks to reach to external resources over HTTPS"
   docker run --name cert-runner -u root -v $DIR/../security:/etc/kafka/secrets  \
     localbuild/connect:${CONFLUENT_DOCKER_TAG}-${CONNECTOR_VERSION} \
       keytool -importkeystore -srckeystore /usr/lib/jvm/temurin-21-jdk/lib/security/cacerts \

@@ -9,7 +9,7 @@
 rm -f *.crt *.csr *_creds *.jks *.srl *.key *.pem *.der *.p12 *.log
 
 # Generate CA key
-openssl req -new -x509 -keyout snakeoil-ca-1.key -out snakeoil-ca-1.crt -days 365 -subj "/CN=${SSL_CA_CN}/OU=TEST/O=CONFLUENT/L=PaloAlto/ST=Ca/C=US" -passin pass:confluent -passout pass:confluent
+openssl req -new -x509 -keyout snakeoil-ca-1.key -out snakeoil-ca-1.crt -days 365 -subj "/CN=qsdev/OU=Test/O=QuantumSignals/L=PaloAlto/ST=Ca/C=US" -passin pass:confluent -passout pass:confluent
 
 # ksqlDB Server (ksqldb-server) and Control Center (control-center) share a commom certificate; a separate certificate is not generated for ksqldb-server
 # this shared certificate has a self-signed CA - when control-center presents the certificate to a browser visiting control-center at https://localhost:9092 ,
@@ -23,8 +23,14 @@ echo "Creating certificates"
 printf '%s\0' "${users[@]}" | xargs -0 -I{} -n1 -P15 sh -c './certs-create-per-user.sh "$1" > "certs-create-$1.log" 2>&1 && echo "Created certificates for $1"' -- {}
 echo "Creating certificates completed"
 
-echo "Exporting keystore and truststore for Python clients"
+echo "Exporting keystores for Python clients"
 rm -r python; mkdir -p python
-yes confluent | keytool -importkeystore -srckeystore kafka.appSA.keystore.jks -destkeystore python/keystore.p12 -deststoretype PKCS12
-yes confluent | keytool -importkeystore -srckeystore kafka.appSA.truststore.jks -destkeystore python/truststore.p12 -deststoretype PKCS12
-openssl pkcs12 -nokeys -in python/truststore.p12 -out python/truststore.pem -passin pass:confluent
+yes confluent | keytool -importkeystore -srckeystore kafka.appSA.keystore.jks -destkeystore python/broker-client.p12 -deststoretype PKCS12
+
+yes confluent | keytool -importkeystore -srckeystore kafka.kafka1.keystore.jks -destkeystore python/broker-ca.p12 -deststoretype PKCS12
+openssl pkcs12 -nokeys -in python/broker-ca.p12 -out python/broker-ca.pem -passin pass:confluent
+
+yes confluent | keytool -importkeystore -srckeystore kafka.schemaregistry.keystore.jks -destkeystore python/schemaregistry-ca.p12 -deststoretype PKCS12
+openssl pkcs12 -nokeys -in python/schemaregistry-ca.p12 -out python/schemaregistry-ca.pem -passin pass:confluent
+
+rm python/*-ca.p12

@@ -22,11 +22,15 @@ keytool -keystore kafka.$i.keystore.jks -alias $i -certreq -file $i.csr -storepa
 # Enables 'confluent login --ca-cert-path /etc/kafka/secrets/snakeoil-ca-1.crt --url https://kafka1:8091'
 DNS_ALT_NAMES=$(printf '%s\n' "DNS.1 = $i" "DNS.2 = localhost")
 if [[ "$i" == "mds" ]]; then
-  DNS_ALT_NAMES=$(printf '%s\n' "$DNS_ALT_NAMES" "DNS.3 = kafka1" "DNS.4 = kafka2")
+  DNS_ALT_NAMES=$(printf '%s\n' "$DNS_ALT_NAMES" "DNS.3 = kafka1" "DNS.4 = $EXTERNAL_HOSTNAME")
 fi
 # control-center and ksqldb-server share a certificate
 if [[ "$i" == "controlCenterAndKsqlDBServer" ]]; then
   DNS_ALT_NAMES=$(printf '%s\n' "$DNS_ALT_NAMES" "DNS.3 = control-center" "DNS.4 = ksqldb-server")
+fi
+# Allow access via external (public) domain
+if [[ "$i" == "kafka1" || "$i" == "schemaregistry" ]]; then
+  DNS_ALT_NAMES=$(printf '%s\n' "$DNS_ALT_NAMES" "DNS.3 = $EXTERNAL_HOSTNAME")
 fi
 
 # Sign the host certificate with the certificate authority (CA)
