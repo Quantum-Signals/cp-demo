@@ -89,16 +89,11 @@ docker compose exec kafka1 kafka-configs \
 
 
 # Bring up more containers
-docker compose up --no-recreate -d schemaregistry connect control-center
+docker compose up --no-recreate -d schemaregistry control-center
 
 echo
 echo -e "Create topics in Kafka cluster:"
 docker compose exec tools bash -c "/tmp/helper/create-topics.sh" || exit 1
-
-# Verify Kafka Connect Worker has started
-MAX_WAIT=240
-echo -e "\nWaiting up to $MAX_WAIT seconds for Connect to start"
-retry $MAX_WAIT host_check_up connect || exit 1
 
 #-------------------------------------------------------------------------------
 

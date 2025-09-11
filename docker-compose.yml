@@ -432,6 +432,8 @@ services:
 
         
   connect:
+    profiles:
+      - donotstart
     image: localbuild/connect:${CONFLUENT_DOCKER_TAG}-${CONNECTOR_VERSION}
     container_name: connect
     restart: always
@@ -679,8 +681,8 @@ services:
         condition: service_healthy
       kafka1:
         condition: service_healthy
-      connect:
-        condition: service_healthy
+      #connect:
+      #  condition: service_healthy
       ksqldb-server:
         condition: service_healthy
       prometheus:
@@ -744,7 +746,7 @@ services:
       PORT: 9021
 
       # Connect
-      CONTROL_CENTER_CONNECT_CONNECT1_CLUSTER: https://connect:8083
+      #CONTROL_CENTER_CONNECT_CONNECT1_CLUSTER: https://connect:8083
 
       # ksqlDB
       # Communication between Control Center and ksqlDB Docker containers
