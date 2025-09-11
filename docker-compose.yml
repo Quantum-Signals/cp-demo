@@ -61,15 +61,16 @@ services:
       - 10091:10091
       - 11091:11091
       - 12091:12091
+      - 14091:14091
     environment:
       KAFKA_PROCESS_ROLES: 'broker,controller'
       CLUSTER_ID: 'XyZBQ3-GTvKH2qNfP7X33A'
 
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_PLAINTEXT,TOKEN:SASL_SSL,SSL:SSL,CLEAR:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_PLAINTEXT,TOKEN:SASL_SSL,SSL:SSL,CLEAR:PLAINTEXT,CONTROLLER:PLAINTEXT,NGINX:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://${EXTERNAL_HOSTNAME}:11091,CLEAR://kafka1:12091
-      KAFKA_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,CONTROLLER://kafka1:13091
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://${EXTERNAL_HOSTNAME}:11091,CLEAR://kafka1:12091,NGINX://${EXTERNAL_HOSTNAME}:4430
+      KAFKA_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,CONTROLLER://kafka1:13091,NGINX://kafka1:14091
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:13091'
       
       KAFKA_SUPER_USERS: User:admin;User:mds;User:superUser;User:ANONYMOUS
@@ -90,6 +91,13 @@ services:
               password="admin-secret" \
               user_admin="admin-secret" \
               user_mds="mds-secret";
+
+      KAFKA_LISTENER_NAME_NGINX_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_LISTENER_NAME_NGINX_PLAIN_SASL_JAAS_CONFIG: |
+              org.apache.kafka.common.security.plain.PlainLoginModule required \
+              username="admin" \
+              password="admin-secret" \
+              user_superUser="${SUPER_USER_PASSWORD}";
 
       # Configure TOKEN listener for Confluent Platform components and impersonation
       KAFKA_LISTENER_NAME_TOKEN_OAUTHBEARER_SASL_SERVER_CALLBACK_HANDLER_CLASS: io.confluent.kafka.server.plugins.auth.token.TokenBearerValidatorCallbackHandler
@@ -791,13 +799,14 @@ services:
       - ./scripts/security/keypair:/tmp/conf
     ports:
       - 8085:8085
+      - 8084:8084
     environment:
       CUB_CLASSPATH: '/usr/share/java/confluent-security/schema-registry/*:/usr/share/java/schema-registry/*:/usr/share/java/schema-registry-plugins/*:/usr/share/java/cp-base-new/*'
 
       SCHEMA_REGISTRY_HOST_NAME: schemaregistry
 
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:10091
-      SCHEMA_REGISTRY_LISTENERS: https://0.0.0.0:8085
+      SCHEMA_REGISTRY_LISTENERS: https://0.0.0.0:8085, http://0.0.0.0:8084
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
 
       SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: OAUTHBEARER
