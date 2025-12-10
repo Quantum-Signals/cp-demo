@@ -15,7 +15,7 @@ ${DIR}/stop.sh
 CLEAN=${CLEAN:-false}
 
 # Build Kafka Connect image with connector plugins
-build_connect_image
+#build_connect_image
 
 # Set the CLEAN variable to true if cert doesn't exist
 if ! [[ -f "${DIR}/security/controlCenterAndKsqlDBServer-ca1-signed.crt" ]] || ! check_num_certs; then
