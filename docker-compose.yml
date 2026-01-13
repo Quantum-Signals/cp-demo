@@ -242,6 +242,8 @@ services:
       KAFKA_PASSWORD_ENCODER_SECRET: encoder-secret
 
       SUPER_USER_PASSWORD: ${SUPER_USER_PASSWORD}
+      # 3GB topic retention:
+      KAFKA_LOG_RETENTION_BYTES: 3221225472
 
   connect:
     profiles:
