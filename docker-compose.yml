@@ -97,8 +97,6 @@ services:
       KAFKA_LISTENER_NAME_NGINX_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_LISTENER_NAME_NGINX_PLAIN_SASL_JAAS_CONFIG: |
               org.apache.kafka.common.security.plain.PlainLoginModule required \
-              username="admin" \
-              password="admin-secret" \
               user_superUser="${SUPER_USER_PASSWORD}";
 
       # Configure TOKEN listener for Confluent Platform components and impersonation
