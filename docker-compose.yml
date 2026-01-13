@@ -55,6 +55,7 @@ services:
       - ./scripts/security/keypair:/tmp/conf
       - ./scripts/helper:/tmp/helper
       - ./scripts/security:/etc/kafka/secrets
+      - kafka1-data:/var/lib/kafka/data
     command: "bash -c 'if [ ! -f /etc/kafka/secrets/kafka.kafka1.keystore.jks ]; then echo \"ERROR: Did not find SSL certificates in /etc/kafka/secrets/ (did you remember to run ./scripts/start.sh instead of docker compose up -d?)\" && exit 1 ; else /etc/confluent/docker/run ; fi'"
     ports:
       - 8091:8091
@@ -1034,4 +1035,9 @@ services:
       - ./env_files/streams-demo.env
     environment:
       KAFKA_REPLICATION_FACTOR: 1
-  
+
+volumes:
+  kafka1-data:
+    driver: local
+    name: cp-demo-kafka1-data
+
