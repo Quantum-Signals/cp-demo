@@ -3,7 +3,7 @@
 for t in wikipedia.parsed WIKIPEDIABOT WIKIPEDIANOBOT; do
 
   echo -e "\nSample message from Topic $t"
-  docker exec connect kafka-avro-console-consumer --bootstrap-server kafka1:11091,kafka2:11092 \
+  docker exec connect kafka-avro-console-consumer --bootstrap-server kafka1:11091 \
     --topic wikipedia.parsed \
     --consumer-property group.id=listen-consumer \
     --consumer-property security.protocol=SSL \

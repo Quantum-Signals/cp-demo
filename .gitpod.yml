@@ -41,7 +41,6 @@ ports:
   onOpen: ignore
 - port: 12091
   onOpen: ignore
-# kafka2
 - port: 8092
   onOpen: ignore
 - port: 9092

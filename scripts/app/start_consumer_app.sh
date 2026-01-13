@@ -10,7 +10,7 @@ ID=$1
 
 
 docker exec connect kafka-avro-console-consumer \
-   --bootstrap-server kafka1:11091,kafka2:11092 \
+   --bootstrap-server kafka1:11091 \
    --topic wikipedia.parsed \
    --consumer-property security.protocol=SSL \
    --consumer-property ssl.truststore.location=/etc/kafka/secrets/kafka.appSA.truststore.jks \

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-docker exec connect kafka-avro-console-consumer --bootstrap-server kafka1:11091,kafka2:11092 \
+docker exec connect kafka-avro-console-consumer --bootstrap-server kafka1:11091 \
   --consumer-property security.protocol=SSL \
   --consumer-property ssl.truststore.location=/etc/kafka/secrets/kafka.clientListen.truststore.jks \
   --consumer-property ssl.truststore.password=confluent \
