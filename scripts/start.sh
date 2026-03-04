@@ -49,6 +49,7 @@ fi
 
 #FIXME: Hack in superUser password.
 sed -i "s|\(userPassword *: *\).*|\1${SUPER_USER_PASSWORD}|" ${DIR}/security/ldap_users/13_superuser.ldif
+sed -i "s|\(userPassword *: *\).*|\1${READONLY_USER_PASSWORD}|" ${DIR}/security/ldap_users/22_readonly.ldif
 
 docker compose up --no-recreate -d openldap
 sleep 5

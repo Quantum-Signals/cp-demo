@@ -29,6 +29,7 @@ C3_ADMIN="User:controlcenterAdmin"
 REST_ADMIN="User:restAdmin"
 CLIENT_PRINCIPAL="User:appSA"
 LISTEN_PRINCIPAL="User:clientListen"
+READONLY_PRINCIPAL="User:readonlyUser"
 
 mds_login $MDS_URL ${SUPER_USER} ${SUPER_USER_PASSWORD} || exit 1
 
@@ -307,6 +308,28 @@ confluent iam rbac role-binding create \
     --prefix \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
+################################### Read-Only User ###################################
+echo "Creating role bindings for Read-Only User"
+
+confluent iam rbac role-binding create \
+    --principal $READONLY_PRINCIPAL \
+    --role DeveloperRead \
+    --resource "Topic:*" \
+    --kafka-cluster-id $KAFKA_CLUSTER_ID
+
+confluent iam rbac role-binding create \
+    --principal $READONLY_PRINCIPAL \
+    --role DeveloperRead \
+    --resource "Group:*" \
+    --kafka-cluster-id $KAFKA_CLUSTER_ID
+
+confluent iam rbac role-binding create \
+    --principal $READONLY_PRINCIPAL \
+    --role DeveloperRead \
+    --resource "Subject:*" \
+    --kafka-cluster-id $KAFKA_CLUSTER_ID \
+    --schema-registry-cluster-id $SR
+
 ######################### Print #########################
 
 echo "Cluster IDs:"
@@ -330,5 +353,6 @@ echo "    ksqlDB Server: $KSQLDB_SERVER"
 echo "    C3 Admin: $C3_ADMIN"
 echo "    Rest Admin: $REST_ADMIN"
 echo "    Client service account: $CLIENT_PRINCIPAL"
-echo "    Listen Client service account: $LISTEN_PRINCIPAL"
+echo "    Listen Client service account: $LISTEN_PRINCIPAL
+    Read-Only user: $READONLY_PRINCIPAL"
 echo
