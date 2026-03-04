@@ -70,14 +70,14 @@ services:
       KAFKA_PROCESS_ROLES: 'broker,controller'
       CLUSTER_ID: 'XyZBQ3-GTvKH2qNfP7X33A'
 
-      # LOCAL: SASL connections to local stack outside Docker network.
+      # PRIVATE: SASL connections via private IP to local stack outside Docker network.
       # LOCALHOST: SASL connections via hardcoded localhost (e.g. SSH port-forwarding).
       # NGINX: external SASL with SSL handled by nginx reverse proxy.
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_PLAINTEXT,TOKEN:SASL_SSL,SSL:SSL,CLEAR:PLAINTEXT,CONTROLLER:PLAINTEXT,NGINX:SASL_PLAINTEXT,LOCAL:SASL_PLAINTEXT,LOCALHOST:SASL_PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_PLAINTEXT,TOKEN:SASL_SSL,SSL:SSL,CLEAR:PLAINTEXT,CONTROLLER:PLAINTEXT,NGINX:SASL_PLAINTEXT,PRIVATE:SASL_PLAINTEXT,LOCALHOST:SASL_PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,NGINX://${EXTERNAL_HOST}:4430,LOCAL://${LOCAL_HOST}:15091,LOCALHOST://localhost:16091
-      KAFKA_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,CONTROLLER://kafka1:13091,NGINX://kafka1:14091,LOCAL://kafka1:15091,LOCALHOST://kafka1:16091
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,NGINX://${EXTERNAL_HOST}:4430,PRIVATE://${PRIVATE_IP}:15091,LOCALHOST://localhost:16091
+      KAFKA_LISTENERS: INTERNAL://kafka1:9091,TOKEN://kafka1:10091,SSL://kafka1:11091,CLEAR://kafka1:12091,CONTROLLER://kafka1:13091,NGINX://kafka1:14091,PRIVATE://kafka1:15091,LOCALHOST://kafka1:16091
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka1:13091'
       
       KAFKA_SUPER_USERS: User:admin;User:mds;User:superUser;User:ANONYMOUS
@@ -104,15 +104,17 @@ services:
               org.apache.kafka.common.security.plain.PlainLoginModule required \
               user_superUser="${SUPER_USER_PASSWORD}";
 
-      KAFKA_LISTENER_NAME_LOCAL_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_LISTENER_NAME_LOCAL_PLAIN_SASL_JAAS_CONFIG: |
+      KAFKA_LISTENER_NAME_PRIVATE_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_LISTENER_NAME_PRIVATE_PLAIN_SASL_JAAS_CONFIG: |
               org.apache.kafka.common.security.plain.PlainLoginModule required \
-              user_superUser="${SUPER_USER_PASSWORD}";
+              user_superUser="${SUPER_USER_PASSWORD}" \
+              user_readonlyUser="${READONLY_USER_PASSWORD}";
 
       KAFKA_LISTENER_NAME_LOCALHOST_SASL_ENABLED_MECHANISMS: PLAIN
       KAFKA_LISTENER_NAME_LOCALHOST_PLAIN_SASL_JAAS_CONFIG: |
               org.apache.kafka.common.security.plain.PlainLoginModule required \
-              user_superUser="${SUPER_USER_PASSWORD}";
+              user_superUser="${SUPER_USER_PASSWORD}" \
+              user_readonlyUser="${READONLY_USER_PASSWORD}";
 
       # Configure TOKEN listener for Confluent Platform components and impersonation
       KAFKA_LISTENER_NAME_TOKEN_OAUTHBEARER_SASL_SERVER_CALLBACK_HANDLER_CLASS: io.confluent.kafka.server.plugins.auth.token.TokenBearerValidatorCallbackHandler
