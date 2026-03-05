@@ -90,7 +90,7 @@ docker compose exec kafka1 kafka-configs \
 
 
 # Bring up more containers
-docker compose up --no-recreate -d schemaregistry control-center
+docker compose up --no-recreate -d schemaregistry control-center node-exporter
 
 echo
 echo -e "Create topics in Kafka cluster:"

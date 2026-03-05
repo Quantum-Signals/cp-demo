@@ -472,17 +472,36 @@ services:
       KIBANA_AUTOCOMPLETETIMEOUT: 3000
       KIBANA_AUTOCOMPLETETERMINATEAFTER: 2500000
 
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: no
+    ports:
+      - "9100:9100"
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
   prometheus:
     image: confluentinc/cp-enterprise-prometheus:2.2.0
     hostname: cp-enterprise-prometheus
     container_name: prometheus
     volumes:
       - ./vol/config:/mnt/config
+      - prometheus_data:/prometheus
     ports:
       - "9090:9090"
     environment:
       CONFIG_PATH: "/mnt/config"
       SHOULD_LOG_TO_FILE: false
+      METRICS_RETENTION_DAYS: 30d
 
   alertmanager:
     image: confluentinc/cp-enterprise-alertmanager:2.2.0
@@ -869,4 +888,5 @@ volumes:
   kafka1-data:
     driver: local
     name: cp-demo-kafka1-data
+  prometheus_data:
 
