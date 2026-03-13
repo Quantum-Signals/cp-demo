@@ -267,7 +267,7 @@ services:
       - donotstart
     image: localbuild/connect:${CONFLUENT_DOCKER_TAG}-${CONNECTOR_VERSION}
     container_name: connect
-    restart: always
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -435,7 +435,7 @@ services:
       - donotstart
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     container_name: elasticsearch
-    #restart: always
+    #restart: unless-stopped
     healthcheck:
       start_period: 10s
       interval: 10s
@@ -454,7 +454,7 @@ services:
       - donotstart
     image: docker.elastic.co/kibana/kibana-oss:7.10.0
     container_name: kibana
-    restart: always
+    restart: unless-stopped
     healthcheck:
       interval: 10s
       retries: 20
@@ -637,7 +637,7 @@ services:
   schemaregistry:
     image: ${REPOSITORY}/cp-schema-registry:${CONFLUENT_DOCKER_TAG}
     container_name: schemaregistry
-    restart: always
+    restart: unless-stopped
     healthcheck:
       start_period: 10s
       interval: 10s
@@ -711,7 +711,7 @@ services:
     image: ${REPOSITORY}/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
     hostname: ksqldb-server
     container_name: ksqldb-server
-    restart: always
+    restart: unless-stopped
     healthcheck:
       start_period: 10s
       interval: 10s
@@ -806,7 +806,7 @@ services:
 
   restproxy:
     image: ${REPOSITORY}/cp-kafka-rest:${CONFLUENT_DOCKER_TAG}
-    restart: always
+    restart: unless-stopped
     depends_on:
       schemaregistry:
         condition: service_healthy
@@ -871,7 +871,7 @@ services:
     profiles:
       - donotstart
     image: cnfldemos/cp-demo-kstreams:0.0.12
-    restart: always
+    restart: unless-stopped
     depends_on:
       schemaregistry:
         condition: service_healthy
