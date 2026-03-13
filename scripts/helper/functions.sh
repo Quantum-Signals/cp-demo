@@ -310,7 +310,9 @@ create_topic() {
   #echo "response code: " $http_code
   #echo $out| jq || true
 
-  if [[ $status -ne 0 || $http_code -gt 299 || -z $out || $out =~ "error_code" ]]; then
+  if [[ $out =~ '"error_code":40002' ]]; then
+    echo "Topic $topic_name already exists, skipping"
+  elif [[ $status -ne 0 || $http_code -gt 299 || -z $out || $out =~ "error_code" ]]; then
     echo "ERROR: create topic failed $out"
     return 1
   else
