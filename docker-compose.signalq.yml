@@ -1,0 +1,49 @@
+# Compose override to integrate cp-demo Kafka with SignalQ observability.
+# Disables cp-demo's own observability services and redirects metrics
+# to the SignalQ Prometheus instance.
+#
+# Usage (from cp-demo directory):
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.signalq.yml
+#
+# Requires the signalq-services network to already exist
+# (start the main SignalQ observability stack first).
+
+services:
+  prometheus:
+    entrypoint: ["true"]
+    network_mode: none
+
+  alertmanager:
+    entrypoint: ["true"]
+    network_mode: none
+
+  node-exporter:
+    entrypoint: ["true"]
+    network_mode: none
+
+  kafka1:
+    environment:
+      KAFKA_CONFLUENT_TELEMETRY_EXPORTER_C3PLUSPLUS_CLIENT_BASE_URL: "http://signalq-prometheus:9090/api/v1/otlp"
+    networks:
+      - default
+      - signalq-services
+
+  control-center:
+    depends_on:
+      schemaregistry:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+    environment:
+      CONTROL_CENTER_PROMETHEUS_ENABLE: "true"
+      CONTROL_CENTER_PROMETHEUS_URL: "http://signalq-prometheus:9090"
+      CONTROL_CENTER_PROMETHEUS_RULES_FILE: "/mnt/config/trigger_rules-generated.yml"
+      CONTROL_CENTER_ALERTMANAGER_URL: "http://localhost:19093"
+      CONTROL_CENTER_ALERTMANAGER_CONFIG_FILE: "/mnt/config/alertmanager-generated.yml"
+    networks:
+      - default
+      - signalq-services
+
+networks:
+  signalq-services:
+    name: signalq-services
