@@ -18,7 +18,7 @@ CLEAN=${CLEAN:-false}
 #build_connect_image
 
 # Set the CLEAN variable to true if cert doesn't exist
-if ! [[ -f "${DIR}/security/controlCenterAndKsqlDBServer-ca1-signed.crt" ]] || ! check_num_certs; then
+if ! [[ -f "${DIR}/security/controlCenterAndKsqlDBServer-ca1-signed.crt" ]]; then
   echo "INFO: Running with CLEAN=true because instructed or certificates don't yet exist."
   clean_demo_env
   CLEAN=true

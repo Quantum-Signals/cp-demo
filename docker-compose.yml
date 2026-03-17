@@ -263,8 +263,7 @@ services:
       KAFKA_LOG_RETENTION_BYTES: 3221225472
 
   connect:
-    profiles:
-      - donotstart
+    profiles: [donotstart]
     image: localbuild/connect:${CONFLUENT_DOCKER_TAG}-${CONNECTOR_VERSION}
     container_name: connect
     restart: unless-stopped
@@ -431,8 +430,7 @@ services:
 
 
   elasticsearch:
-    profiles:
-      - donotstart
+    profiles: [donotstart]
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
     container_name: elasticsearch
     #restart: unless-stopped
@@ -450,8 +448,7 @@ services:
       cluster.name: "elasticsearch-cp-demo"
 
   kibana:
-    profiles:
-      - donotstart
+    profiles: [donotstart]
     image: docker.elastic.co/kibana/kibana-oss:7.10.0
     container_name: kibana
     restart: unless-stopped
@@ -533,8 +530,6 @@ services:
         condition: service_healthy
       #connect:
       #  condition: service_healthy
-      ksqldb-server:
-        condition: service_healthy
       prometheus:
         condition: service_started
       alertmanager:
@@ -708,6 +703,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_UPDATE_HANDLERS: io.confluent.schema.exporter.storage.SchemaExporterUpdateHandler
 
   ksqldb-server:
+    profiles: [donotstart]
     image: ${REPOSITORY}/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
     hostname: ksqldb-server
     container_name: ksqldb-server
@@ -794,6 +790,7 @@ services:
       SUPER_USER_PASSWORD: ${SUPER_USER_PASSWORD}
 
   ksqldb-cli:
+    profiles: [donotstart]
     image: ${REPOSITORY}/cp-ksqldb-cli:${CONFLUENT_DOCKER_TAG}
     container_name: ksqldb-cli
     depends_on:
@@ -805,6 +802,7 @@ services:
     tty: true
 
   restproxy:
+    profiles: [donotstart]
     image: ${REPOSITORY}/cp-kafka-rest:${CONFLUENT_DOCKER_TAG}
     restart: unless-stopped
     depends_on:
@@ -868,8 +866,7 @@ services:
 
 
   streams-demo:
-    profiles:
-      - donotstart
+    profiles: [donotstart]
     image: cnfldemos/cp-demo-kstreams:0.0.12
     restart: unless-stopped
     depends_on:
