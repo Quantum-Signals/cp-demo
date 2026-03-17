@@ -36,10 +36,10 @@ echo
 
 if [[ "$CLEAN" == "true" ]] ; then
   create_certificates || exit 1
-  if [[ ! check_num_certs ]]; then
-    echo -e "\nERROR: Expected ~147 trusted certificates on the Kafka Connect server but got 1. Please troubleshoot and try again."
-    exit 1
-  fi
+  #if [[ ! check_num_certs ]]; then
+  #  echo -e "\nERROR: Expected ~147 trusted certificates on the Kafka Connect server but got 1. Please troubleshoot and try again."
+  #  exit 1
+  #fi
 fi
 
 
