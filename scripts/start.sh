@@ -30,7 +30,6 @@ echo "  REPOSITORY=$REPOSITORY"
 echo "  CONNECTOR_VERSION=$CONNECTOR_VERSION"
 echo "  CLEAN=$CLEAN"
 echo "  VIZ=$VIZ"
-echo "  C3_KSQLDB_HTTPS=$C3_KSQLDB_HTTPS"
 echo
 
 
@@ -111,23 +110,6 @@ echo
 
 #-------------------------------------------------------------------------------
 
-# Start more containers
-docker compose up --no-recreate -d ksqldb-server ksqldb-cli restproxy
-
-# Verify ksqlDB server has started
-echo
-echo
-MAX_WAIT=120
-echo -e "\nWaiting up to $MAX_WAIT seconds for ksqlDB server to start"
-retry $MAX_WAIT host_check_up ksqldb-server || exit 1
-
-if [[ "$VIZ" == "true" ]]; then
-  build_viz || exit 1
-fi
-
-
-#-------------------------------------------------------------------------------
-
 
 # Verify Docker containers started
 if [[ $(docker compose ps) =~ "Exit 137" ]]; then
@@ -159,17 +141,6 @@ DONE! From your browser:
   Confluent Control Center (login superUser/\$SUPER_USER_PASSWORD for full access):
      $C3URL
 
-EOF
-
-if [[ "$VIZ" == "true" ]]; then
-cat << EOF
-  Kibana
-     $kibanaURL
-
-EOF
-fi
-
-cat << EOF
 Want more? Learn how to replicate data from the on-prem cluster to Confluent Cloud:
 
      https://docs.confluent.io/platform/current/tutorials/cp-demo/docs/hybrid-cloud.html
