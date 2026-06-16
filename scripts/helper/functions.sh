@@ -140,15 +140,6 @@ create_certificates()
   chmod 644 ${DIR}/../security/keypair/keypair.pem
   chmod 644 ${DIR}/../security/*.key
 
-  echo -e "INFO: Adding default java certificates to kafka.connect.truststore.jks to reach to external resources over HTTPS"
-  docker run --name cert-runner -u root -v $DIR/../security:/etc/kafka/secrets  \
-    localbuild/connect:${CONFLUENT_DOCKER_TAG}-${CONNECTOR_VERSION} \
-      keytool -importkeystore -srckeystore /usr/lib/jvm/temurin-21-jdk/lib/security/cacerts \
-        -srcstorepass changeit -destkeystore /etc/kafka/secrets/kafka.connect.truststore.jks \
-        -deststorepass confluent -keypass confluent
-  
-  docker cp cert-runner:/etc/kafka/secrets/kafka.connect.truststore.jks ${DIR}/../security/kafka.connect.truststore.jks
-  docker rm cert-runner
 }
 
 build_tools_image()
