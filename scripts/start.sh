@@ -9,37 +9,25 @@ source ${DIR}/env.sh
 # Do preflight checks
 preflight_checks || exit
 
-# Stop existing Docker containers
+# Stop existing Docker containers (this also deletes the certificates)
 ${DIR}/stop.sh
-
-CLEAN=${CLEAN:-false}
 
 # Build Kafka Connect image with connector plugins
 #build_connect_image
-
-# Set the CLEAN variable to true if cert doesn't exist
-if ! [[ -f "${DIR}/security/controlCenterAndKsqlDBServer-ca1-signed.crt" ]]; then
-  echo "INFO: Running with CLEAN=true because instructed or certificates don't yet exist."
-  clean_demo_env
-  CLEAN=true
-fi
 
 echo
 echo "Environment parameters"
 echo "  REPOSITORY=$REPOSITORY"
 echo "  CONNECTOR_VERSION=$CONNECTOR_VERSION"
-echo "  CLEAN=$CLEAN"
 echo "  VIZ=$VIZ"
 echo
 
-
-if [[ "$CLEAN" == "true" ]] ; then
-  create_certificates || exit 1
-  #if [[ ! check_num_certs ]]; then
-  #  echo -e "\nERROR: Expected ~147 trusted certificates on the Kafka Connect server but got 1. Please troubleshoot and try again."
-  #  exit 1
-  #fi
-fi
+# Always create new certificates
+create_certificates || exit 1
+#if [[ ! check_num_certs ]]; then
+#  echo -e "\nERROR: Expected ~147 trusted certificates on the Kafka Connect server but got 1. Please troubleshoot and try again."
+#  exit 1
+#fi
 
 
 #-------------------------------------------------------------------------------
@@ -89,7 +77,7 @@ docker compose exec kafka1 kafka-configs \
 
 
 # Bring up more containers
-docker compose up --no-recreate -d schemaregistry control-center node-exporter
+docker compose up --no-recreate -d schemaregistry control-center node-exporter license-exporter
 
 echo
 echo -e "Create topics in Kafka cluster:"

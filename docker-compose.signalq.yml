@@ -44,6 +44,24 @@ services:
       - default
       - signalq-services
 
+  # Exposes the Confluent license status as Prometheus metrics, scraped by
+  # signalq-prometheus (job cp-license).
+  license-exporter:
+    build: ./license-exporter
+    container_name: cp-license-exporter
+    restart: unless-stopped
+    init: true
+    depends_on:
+      - kafka1
+    environment:
+      KAFKA_BOOTSTRAP: kafka1:12091
+      # A stored trial gives 30 days' warning before it breaks the stack, so
+      # there is nothing to gain from checking more often than this.
+      CHECK_INTERVAL: 1800
+    networks:
+      - default
+      - signalq-services
+
 networks:
   signalq-services:
     name: signalq-services

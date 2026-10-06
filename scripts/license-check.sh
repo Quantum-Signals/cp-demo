@@ -45,7 +45,7 @@ echo "Records: ${offsets##*:} (end offset)"
 
 dump=$(docker exec $KAFKA_CONTAINER kafka-console-consumer \
   --bootstrap-server $BOOTSTRAP --topic $LICENSE_TOPIC \
-  --from-beginning --timeout-ms 10000 2>/dev/null)
+  --from-beginning --timeout-ms 10000 2>/dev/null | tr -d '\0')
 echo
 
 # A JWT only appears in CONFLUENT_LICENSE records. Keep topic order (last one wins).
